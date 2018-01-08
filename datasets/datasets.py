@@ -25,38 +25,20 @@ special_items = rating.groupby('movieId', gl.aggregate.COUNT).sort('Count')
 rare_items = special_items[special_items['Count'] <= 5]
 popular_items = special_items[special_items['Count'] >= 800]
 
+rating = rating.filter_by(rare_items['movieId'], 'movieId', exclude=True)
+rating = rating.filter_by(popular_items['movieId'], 'movieId', exclude=True)
+
+rating = rating[rating['rating'] > 3]
+
 rating = gl.cross_validation.shuffle(rating)
 
 folds = gl.cross_validation.KFold(rating, 5)
-
 
 (train1, test1) = folds[0]
 (train2, test2) = folds[1]
 (train3, test3) = folds[2]
 (train4, test4) = folds[3]
 (train5, test5) = folds[4]
-
-train1 = train1.filter_by(rare_items['movieId'], 'movieId', exclude=True)
-train1 = train1.filter_by(popular_items['movieId'], 'movieId', exclude=True)
-
-train2 = train2.filter_by(rare_items['movieId'], 'movieId', exclude=True)
-train2 = train2.filter_by(popular_items['movieId'], 'movieId', exclude=True)
-
-train3 = train3.filter_by(rare_items['movieId'], 'movieId', exclude=True)
-train3 = train3.filter_by(popular_items['movieId'], 'movieId', exclude=True)
-
-train4 = train4.filter_by(rare_items['movieId'], 'movieId', exclude=True)
-train4 = train4.filter_by(popular_items['movieId'], 'movieId', exclude=True)
-
-train5 = train5.filter_by(rare_items['movieId'], 'movieId', exclude=True)
-train5 = train5.filter_by(popular_items['movieId'], 'movieId', exclude=True)
-
-train1 = train1[train1['rating'] > 3]
-train2 = train2[train2['rating'] > 3]
-train3 = train3[train3['rating'] > 3]
-train4 = train4[train4['rating'] > 3]
-train5 = train5[train5['rating'] > 3]
-
 
 train1_data_genre = train1.join(movie, on='movieId', how='left')
 train2_data_genre = train2.join(movie, on='movieId', how='left')
